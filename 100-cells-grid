@@ -1,0 +1,45 @@
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
+# Define the parameters
+initial_x = 0
+initial_y = 0
+square_size_mm = 6
+row_height_mm = 6
+adjusted_font_size = 9  # Adjusted font size for visibility
+rows = [2, 6, 8, 10, 10, 12, 12, 12, 10, 8, 6, 4]
+row_offsets_mm = [30.0, 18.0, 12.0, 6.0, 6.0, 0.0, 0.0, 0.0, 6.0, 12.0, 18.0, 24.0]
+
+# Convert square size and offsets to inches for matplotlib (1 inch = 25.4 mm)
+square_size_in = square_size_mm / 25.4
+row_height_in = row_height_mm / 25.4
+row_offsets_in = [offset / 25.4 for offset in row_offsets_mm]
+
+# Create figure with appropriate size in inches and high DPI for printing
+fig, ax = plt.subplots(figsize=(10, 8), dpi=300)
+
+line_width = 1  # Adjusted line width for the grid
+
+current_y = initial_y  # Start from the top again
+for i, (num_squares, offset_in) in enumerate(zip(rows, row_offsets_in)):
+    current_x = initial_x + offset_in
+    # Starting number for row should now increment for each square to number from left to right
+    starting_number_for_row = sum(rows[:i]) + 1  # Adjust the starting number for each row based on previous rows
+    for _ in range(num_squares):
+        # Draw the square with specified line width
+        ax.add_patch(patches.Rectangle((current_x, current_y), square_size_in, square_size_in, edgecolor='black', facecolor='none', linewidth=line_width))
+        # Place the number in the upper left corner of the square
+        text_x = current_x + (0.5 / 25.4)  # Slight offset from the left edge in inches
+        text_y = current_y + square_size_in - (0.5 / 25.4)  # Slight offset from the top edge in inches
+        ax.text(text_x, text_y, str(starting_number_for_row), ha='left', va='top', fontsize=adjusted_font_size, color='black')  # Ensure text is in black for visibility
+        current_x += square_size_in
+        starting_number_for_row += 1  # Increment for left to right numbering
+    current_y -= row_height_in
+
+ax.set_aspect('equal', 'box')
+ax.autoscale_view()
+ax.axis('off')
+
+# Save to SVG and PDF files
+plt.savefig("squares_grid_line_width_0.4.svg", format='svg', bbox_inches='tight')
+plt.savefig("squares_grid_line_width_0.4.pdf", format='pdf', bbox_inches='tight')
